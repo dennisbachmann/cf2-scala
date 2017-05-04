@@ -2,29 +2,28 @@ package ca.uwo.ece.recommender.utils
 
 import java.io.FileNotFoundException
 
-import scala.reflect.io.File
+import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.FileSystem
+import org.apache.spark.SparkContext
 
 /**
   * Created by dennisbachmann on 2017-04-28.
   */
 object FileUtils {
-
-  // TODO: Make this object HDFS friendly
-
   /*
-   * Helpers for Mpdel Files
+   * Helpers for Model Files
    */
   /**
     * Returns the expected filename of a contextual model.
     * This helpers specifies the location to store the models and remove non-alphanumeric characters from its name.
     *
-    * By default, the conventional location to store the models is the cf2-scala/models folder.
+    * By default, the conventional location to store the models is the hdfs://master:9000/cf2-scala/models folder.
     *
     * @param name contains the name of the model
     * @return the expected filename of a contextual model
     */
   def fileNameForModel(name: String): String = {
-    val path = "models"
+    val path = "hdfs://master:9000/cf2-scala/models"
     if (fileExists(path)) {
       val sanitizedName = name.replaceAll("[^A-Za-z0-9]", "")
       s"$path/$sanitizedName"
@@ -63,13 +62,14 @@ object FileUtils {
     * Returns the expected filename of a mapping file.
     * This helpers specifies the location to store the mappings for contextual models.
     *
-    * By default, the conventional location to store the models is the cf2-scala/models/mappings folder.
+    * By default, the conventional location to store the models is the
+    * hdfs://master:9000/cf2-scala/models/mappings folder.
     *
     * @param name contains the name of the model
     * @return the expected filename of a contextual model
     */
   def fileNameForMapping(name: String): String = {
-    val path = "models/mappings"
+    val path = "hdfs://master:9000/cf2-scala/models/mappings"
     if (fileExists(path)) {
       s"$path/$name"
     }
@@ -103,15 +103,15 @@ object FileUtils {
   /*
    * Helpers for Standard Files
    */
-
   /**
-    * Returns the file of a mapping having the provided name.
+    * Returns the filesystem configured with application's hadoop setup.
     *
-    * @param name contains the name of the file
-    * @return the requested file
+    * @return the filesystem associated with hadoop configuration files
     */
-  def fileForName(name: String): File = {
-    File(name)
+  def fileSystem(): FileSystem = {
+    val hadoopConfig = SparkContext.getOrCreate.hadoopConfiguration
+
+    FileSystem.get(hadoopConfig)
   }
 
   /**
@@ -121,8 +121,9 @@ object FileUtils {
     * @return true if file exists
     */
   def fileExists(name: String): Boolean = {
-    val file = fileForName(name)
-    file.isDirectory || file.isFile
+    val path = new Path(name)
+
+    fileSystem.exists(path)
   }
 
   /**
@@ -132,7 +133,8 @@ object FileUtils {
     * @return true if deletion was successful
     */
   def deleteFile(name: String): Boolean = {
-    val file = fileForName(name)
-    file.deleteRecursively()
+    val path = new Path(name)
+
+    fileSystem.delete(path, true)
   }
 }
