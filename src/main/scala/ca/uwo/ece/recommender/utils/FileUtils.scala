@@ -12,7 +12,7 @@ object FileUtils {
   // TODO: Make this object HDFS friendly
 
   /*
-   * Helpers for Mpdel Files
+   * Helpers for Model Files
    */
   /**
     * Returns the expected filename of a contextual model.
