@@ -106,19 +106,12 @@ object FileUtils {
 
   /**
     * Returns the file of a mapping having the provided name.
-    * This helpers throws an exception if file doesn't exist.
     *
     * @param name contains the name of the file
     * @return the requested file
-    * @throws FileNotFoundException if file doesn't exist
     */
   def fileForName(name: String): File = {
-    if (fileExists(name)) {
-      File(name)
-    }
-    else {
-      throw new FileNotFoundException(s"File '$name' not found")
-    }
+    File(name)
   }
 
   /**
