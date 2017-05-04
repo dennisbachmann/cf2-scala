@@ -5,7 +5,7 @@ by leveraging the local learning technique.
 
 ## TO-DO
 
-- Adapt _FileUtils_ to be _HDFS_ friendly
+- Adapt _FileUtils_ to be _HDFS_ friendly (basic implementation available in HDFS branch)
 - Enable the use of external knowledge in the contextualization process
 - Build _REST_ integration to enable the creation of Web services
 
